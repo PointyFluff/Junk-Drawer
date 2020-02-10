@@ -1,0 +1,7 @@
+[90m[main 2020-02-10T19:36:22.609Z][0m update#setState idle
+bash: cannot set terminal process group (-1): Inappropriate ioctl for device
+bash: no job control in this shell
+[90m[main 2020-02-10T19:36:52.616Z][0m update#setState checking for updates
+[90m[main 2020-02-10T19:36:52.696Z][0m update#setState available for download
+(node:12877) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+(node:12877) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.

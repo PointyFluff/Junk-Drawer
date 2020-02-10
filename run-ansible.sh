@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Quick n Dirty script to help others run ansible deployments on the fly. 
+# TODO: needs more documentation. 
+# Samuel E. Bray
 source ./colors
 
 VIEW=0
@@ -10,7 +13,7 @@ PLAYBOOK=""
 ANSIBLE_PLAYBOOK_COMMAND="ansible-playbook"
 OTHER_COMMANDS=""
 CHECK=""
-LINODE="echo 'no linode-cli'" 
+LINODE="echo 'no linode-cli'" # WTF
 LINODE_NODES=""
 
 # Turn off host key checking in ansible, also should be turned off in inventory.
