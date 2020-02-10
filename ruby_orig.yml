@@ -1,0 +1,159 @@
+---
+
+# Potential host has 14.04.05LTS installed
+# with ruby-1.8.7-p374 installed via rvm hosting the plugins below
+# 
+- hosts: "*"
+  vars:
+#    ansible_python_interpreter: /usr/bin/python3 # 18.04
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+  remote_user: root
+  become: yes
+  tasks:
+  
+      - name: "Verify server"
+        ping:
+
+      - name: "Add Phusion Pasenger Keys"
+        apt_key:
+          keyserver: keyserver.ubuntu.com
+          id: 561F9B9CAC40B2F7
+      
+      - name: "Add Phusion Passenger Repository"
+        apt_repository:
+          repo: deb https://oss-binaries.phusionpassenger.com/apt/passenger trusty main
+          state: present
+          filename: passenger
+
+      - name: "Update System"
+        apt:
+          autoclean: yes
+          autoremove: yes
+          update_cache: yes
+          cache_valid_time: 36000
+          force_apt_get: yes
+          upgrade: yes
+
+      - name: "Install Packages"
+        apt:
+          autoclean: yes
+          autoremove: yes
+          update_cache: yes
+          cache_valid_time: 36000
+          force_apt_get: yes
+          state: latest
+          install_recommends: yes
+          name: "{{ item }}"
+        with_items:
+          - build-essential
+          - gnupg
+          - zlib1g-dev
+          - libssl-dev
+          - libpcre3-dev
+          - libcurl4-openssl-dev
+          - libxml2
+          - libxml2-dev
+          - libxslt1-dev
+          - mysql-client
+          - mysql-server
+          - libmysqlclient-dev
+          - git
+          - nginx
+          - dirmngr
+#          - gpg # 18.04
+          - gpgv2 # 14.04
+          - apt-transport-https
+          - ca-certificates
+#          - libnginx-mod-http-passenger # 18.04
+          - nginx-extras # 14.04
+          - passenger # 14.04
+
+      - name: "Add RVM Keys"
+        shell: 'gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB'
+        args:
+          warn: false
+        register: rvmPGP
+
+      - name: "Install stable ruby branch from from rvm.io"
+        shell: 'curl -sSL https://get.rvm.io | bash -s stable --ruby=1.8.7'
+#       shell: 'curl -sSL https://get.rvm.io | bash -s stable --ruby'
+        args:
+          warn: false
+        register: rvmInstall
+
+      - name: "Setup RVM environment"
+        shell: 'source /etc/profile'
+        args:
+          warn: false
+          executable: /bin/bash
+        register: rvmEnv
+
+      - name: "Setup Ruby environment"
+        shell: 'source /usr/local/rvm/scripts/rvm'
+        args:
+          warn: false
+          executable: /bin/bash
+        register: rubyEnv
+
+      - name: Reboot & Reconnect
+        shell: "sleep 5 && reboot"
+        async: 1
+        poll: 0
+        
+      - name: Wait for reboot to complete.
+        wait_for_connection:
+          connect_timeout: 20
+          sleep: 5
+          delay: 5
+          timeout: 300
+
+      # - name: "Set Ruby 1.8.7 as default"
+      #   shell: 'rvm use 1.8.7 --default'
+      #   args:
+      #     warn: false
+      #   register: rubyVersion
+
+      # ADD USERS TO RVM, UNCOMMENT AND EDIT ITEMS LIST
+      # - name: "Add EXISTING users to rvm group"
+      #   user:
+      #     append: yes
+      #     groups: rvm
+      #     name: "{{ item }}"
+      #   with_items:
+      #     - "example_user_a"
+      #     - "example_user_b"
+      #     - "example_user_etc"
+
+#      - name: "Facts!"
+#        setup:
+
+      - name: "Install Rake Gem"
+        gem:
+          name: rake
+          version: 0.8.4
+          include_doc: no
+          state: present
+          env_shebang: yes
+
+      - name: "Install Rails Gem"
+        gem:
+          name: rails
+          version: 2.2.2
+          include_doc: no
+          state: present
+
+      # This only seems to install under ruby 1.8.7, maybe only on 14.04 as well...
+      - name: "Install MySQL Gem"
+        gem:
+          name: mysql
+          version: 2.7
+          include_doc: no
+          state: present
+      
+      - name: "Install Passenger Gem"
+        gem:
+          name: passenger
+          version: 2.1.2
+          include_doc: no
+          state: present
+...

@@ -1,0 +1,115 @@
+---
+
+# Setup Web Servers Here
+# Should only listen to SSL on 774 from single IP w/ key 
+# MySQL on 336 with server IPs
+# Should only talk on 443 and 3306 for web and mysql 
+# No root login 
+# No SSL password 
+# Fail2Ban, no icmp ping
+# nginx, mysql, ruby, nodejs (from source?).
+
+- hosts: "*"
+  vars: 
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+  become: true
+  remote_user: root
+  tasks:
+
+    - name: "Ensure we can login to host"
+      ping:
+
+    - name: "Add wheel group"
+      group:
+        name: wheel
+        state: present
+
+    - name: "Allow wheel group to have passwordless"
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: '^%wheel'
+        line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
+    
+    - name: "Add user deploy"
+      user:
+        name: deploy
+        comment: App deployment user
+        append: yes
+        create_home: yes
+        shell: /bin/bash
+        groups: wheel
+
+    - name: "Add ssh key for deploy"
+      authorized_key:
+        user: deploy
+        path: /home/deploy/.ssh/authorized_keys
+        state: present
+        key: "{{ lookup('file', 'keys/deploy_id.pub') }}"
+
+    - name: "Change ssh port"
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        state: present
+        regexp: '^Port'
+        line: 'Port 774'
+        backup: yes
+
+    - name: "Restrict ssh password login"
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        state: present
+        regexp: '^PasswordAuthentication'
+        line: 'PasswordAuthentication no'
+        backup: yes
+      
+    - name: "Restrict ssh root login"
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        state: present
+        regexp: '^PermitRootLogin'
+        line: 'PermitRootLogin no'
+        backup: yes
+
+    - name: "Setup firewall"
+      ufw:
+        logging: on
+
+    - name: "Enable port 774 for SSH"
+      ufw:
+        rule: allow
+        port: 774
+        proto: tcp
+
+    - name: "Connection rate limiting"
+      ufw: 
+        rule: limit
+        port: 774
+        proto: tcp
+
+    - name: "Enable port 443 for Web"
+      ufw:
+        rule: allow
+        port: 443
+        proto: tcp
+
+    - name: "Enable port 80"
+      ufw:
+        rule: allow
+        port: 80
+        proto: tcp
+
+    - name: "Disable extraneous ports"
+      ufw:
+        rule: deny
+        port: '{{ item }}'
+      with_items:
+        - 21
+        - 554
+        - 7070
+
+    - name: "Enable firewall"
+      ufw:
+        state: enabled
+...

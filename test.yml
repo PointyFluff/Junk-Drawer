@@ -1,0 +1,21 @@
+---
+  - hosts: "*"
+    vars:
+      ansible_python_interpreter: /usr/bin/python3
+      ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+    become: yes
+    remote_user: root
+    tasks:
+
+      - name: Test
+        ping:
+
+      - name: Update System
+        apt:
+          force_apt_get: yes
+          autoclean: yes
+          autoremove: yes 
+          cache_valid_time: 36000
+          update_cache: yes
+          upgrade: yes
+...
