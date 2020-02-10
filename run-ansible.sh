@@ -10,7 +10,7 @@ PLAYBOOK=""
 ANSIBLE_PLAYBOOK_COMMAND="ansible-playbook"
 OTHER_COMMANDS=""
 CHECK=""
-LINODE="echo 'no linode-cli'"
+LINODE="echo 'no linode-cli'" 
 LINODE_NODES=""
 
 # Turn off host key checking in ansible, also should be turned off in inventory.
@@ -25,10 +25,10 @@ print_help() {
     printf "\t-c, --check\t ${DIM}${yellow} Run ansible in CHECK mode (-C)${end}\n"
     printf "\t-f, --inventory\t ${DIM}${yellow} /path/to/inventory/file${end}\n"
     printf "\t-i, --ip\t ${DIM}${yellow} Use IP address for ansible host${end}\n"
-    printf "\t-l, --list\t ${DIM}${yellow} Use IP address list for ansible hosts ${red}(NOT IMPLEMENTED)${end}\n"
+    printf "\t-l, --list\t ${DIM}${yellow} Use IP address list for ansible hosts ${red}(TODO)${end}\n" #TODO:
     printf "\t-p, --playbook\t ${DIM}${yellow} /path/to/playbook/file${end}\n"
     printf "\t-o, --other\t ${DIM}${yellow} \"Quoted list of ansible-playbook options\"${end}\n"
-    printf "\t-u, --users\t ${DIM}${yellow} \"Quoted space separated list of users to add\" ${red}(NOT IMPLEMENTED)${end}\n"
+    printf "\t-u, --users\t ${DIM}${yellow} \"Quoted space separated list of users to add\" ${red}(TODO)${end}\n" #TODO:
     printf "\t-w, --view\t ${DIM}${yellow} View the ansible-playbook command rather than executing it${end}\n"
     printf "\t-v, --verbose\t ${DIM}${yellow} Run ansible-playbook verbose${end}\n"
     printf "\t-h, --help\t ${DIM}${yellow} This help${end}\n\n"
@@ -163,6 +163,7 @@ else
      PORTs=$(grep ansible_port ${INV_FILE} | awk '{print $2}' | sort -u) 
      INVENTORY="${INV_FILE}"
 fi
+
 #Handle Playbook
 printf "${end}\n ${PLAYBOOK}: \t"
 if [[ ! -s ${PLAYBOOK} ]]; then 
@@ -172,6 +173,11 @@ else
     printf "${green}OK"; 
 fi
 printf "${end}\n"
+
+# TODO: check this stuff first
+# TODO: add as a separate command option 
+# TODO: move to top
+# TODO: make this a function. 
 
 # Check for apps
 # Required: ansible, sshpass
@@ -191,6 +197,9 @@ else
     printf "${green}$(which sshpass)${end}\n"
 fi
 
+# FIXME: Fix this
+# check for linode-cli
+# TODO: something useful
 printf " linode-cli:\t\t"
 if [[ ! $(which linode-cli) ]]; then 
     printf "${yellow}Gonna need this maybe${end}\n"
@@ -206,7 +215,6 @@ else
         printf "${DIM}( Maybe run: ${magenta}linode-cli configure${end}${DIM} )${end}\n"
     fi
 fi
-
 printf " jq:\t\t\t"
 if [[ ! $(which jq) ]]; then
     printf "${ltYellow}Gonna need this to use linode-cli${end}\n"
@@ -240,6 +248,7 @@ printf "\n"
 #end house keeping
 
 #Run ansible
+# TODO:  I need a function!
 
 RUN_ME="${ANSIBLE_PLAYBOOK_COMMAND} -k -i ${INVENTORY} ${PLAYBOOK} ${OTHER_COMMANDS} ${CHECK}"
 
@@ -247,6 +256,7 @@ RUN_ME="${ANSIBLE_PLAYBOOK_COMMAND} -k -i ${INVENTORY} ${PLAYBOOK} ${OTHER_COMMA
 if [[ $VIEW -ne 0 ]]; then
     printf "${DIM}${ltBlue}Command:\t ${end}${RUN_ME}\n\n"
 else
+
 #RUN FOR REAL
     printf "${ltRed}Running:\t ${end}${RUN_ME}\n\n"
     ${RUN_ME}
