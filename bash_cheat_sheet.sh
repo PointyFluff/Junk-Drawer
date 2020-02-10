@@ -1,8 +1,16 @@
 #!/usr/bin/env bash
 
+# Bash cheat sheet, self referential cheat sheet 
+# goal, spit out itself in multiple formats.
+
 ## SOURCE ME! I'M NEAT!
 ## source ./bash_cheat_sheet.sh
 
+# (C) 2018 Samuel E. Bray
+
+
+
+# FIXME Broken escaped heredoc
 echo <<'EOF'> $bcs_sh
 #!/usr/bin/env bash
 
