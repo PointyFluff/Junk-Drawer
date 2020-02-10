@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# need to add some command line handling here
-# also error handling
-
-
 source ./colors
 
 keyfolder=keys
@@ -14,8 +10,6 @@ invFile="hosts.yml"
 playBook="deploy.yml"
 IPs=$(grep ansible_host ${invFile} | awk '{print $2}' | sort -u)
 PORTs=$(grep ansible_port ${invFile} | awk '{print $2}' | sort -u)
-USER_LIST="A B C D E F" #user list, replace with real users. 
-
 
 usage() { 
     printf "Usage: "
@@ -42,7 +36,7 @@ done
 echo 
 
 
-for keyname in $USER_LIST
+for keyname in matt samuel bryce deploy
 do
     if [ ! -e $keyfolder/${keyname}_id ]
     then
