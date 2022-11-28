@@ -11,7 +11,8 @@
 
 
 # FIXME Broken escaped heredoc
-echo <<'EOF'> $bcs_sh
+# Past me sucks at writing bugs.
+echo <<'EOFF' > bcs_sh
 #!/usr/bin/env bash
 
 #variables
@@ -283,7 +284,7 @@ echo -n "How about a nice game of global thermo nuclear war? [yes/no]: "
 read -n 1 ans # just one char (no enter)
 echo $ans
 
-EOF 
+EOFF 
 ## END $bcs_sh
 
 echo <<'EOF' > $bcs_html
